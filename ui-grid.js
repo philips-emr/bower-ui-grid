@@ -29175,7 +29175,7 @@ angular.module('ui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('ui-grid/selectionSelectAllButtons',
-    "<div class=\"ui-grid-selection-row-header-buttons ui-grid-icon-ok\" ng-class=\"{'ui-grid-all-selected': grid.selection.selectAll}\" ng-click=\"headerButtonClick($event)\"></div>"
+    "<div class=\"ui-grid-selection-row-header-buttons ui-grid-icon-ok\" ng-class=\"{'ui-grid-all-selected': grid.selection.selectAll, 'ui-grid-all-indeterminate': (!grid.selection.selectAll && (grid.selection.selectedCount > 0))}\" ng-click=\"headerButtonClick($event)\"></div>"
   );
 
 
