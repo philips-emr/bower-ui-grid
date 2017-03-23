@@ -22100,13 +22100,14 @@ module.filter('px', function() {
                   var pageX = $scope.grid.element.find('.ui-grid-viewport')[0].scrollLeft + event.pageX-gridLeft;
                   var wrapperX = pageX - movingElm.offsetParent()[0].offsetLeft + changeValue;
                   var left = movingElm[0].offsetLeft + changeValue;
+                  var limit = $scope.grid.element[0].offsetWidth;
 
                   if(left > wrapperX){
                     left = wrapperX;
                   }
 
                   //Update css of moving column to adjust to new left value or fire scroll in case column has reached edge of grid
-                  if ((currentElmLeft >= gridLeft || changeValue > 0) && (currentElmRight <= rightMoveLimit || changeValue < 0)) {
+                  if ((currentElmLeft >= gridLeft || changeValue > 0) && (currentElmRight <= limit || changeValue < 0)) {
                     movingElm.css({visibility: 'visible', 'left': left});
                   } else if (totalColumnWidth > Math.ceil(uiGridCtrl.grid.gridWidth)) {
                     changeValue *= 8;
