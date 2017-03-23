@@ -21841,6 +21841,40 @@ module.filter('px', function() {
                 var movingElm;
                 var reducedWidth;
                 var moveOccurred = false;
+                var mouseMoveInterval = null;
+
+                var scrollFn = function(event) {
+                  // left position of the columns area when the uigrid is scrolling horizontally. Cannot be fixed the index 1. I only using this index because in my tests, the grid was multiselect = true
+                  var offset = parseInt(angular.element($scope.grid.element.find(".ui-grid-header-cell-wrapper")[1]).css("margin-left"));
+                  var left = $scope.grid.movingElm.left;
+				  var limit = $scope.grid.element[0].offsetWidth - 50;
+                  //left -= offset;
+                  var maxScroll = getScrollableElement()[0].scrollWidth;
+                  var scrolled = getScrollableElement()[0].scrollLeft;
+                  left = (left > maxScroll || isHorizontalScrollAtEnd()) ? Math.ceil(maxScroll - $scope.grid.movingElm.element.width()) : scrolled == 0 ? 0 : left;
+				  if(left > limit) {
+					  left = limit;
+				  } else if (left < 0) {
+					  left = 0;
+				  }
+                  $scope.grid.movingElm.element.css({visibility: 'visible', 'left': left });
+                }
+
+                var mouseEnterFn = function(e) {
+                  clearInterval(mouseMoveInterval);
+                }
+
+                var mouseLeaveFn = function(e) {
+                  mouseMoveInterval = setInterval(() => {
+                    if (!$scope.grid.movingElm || isHorizontalScrollAtEnd()) {
+                      clearInterval(mouseMoveInterval);
+                    } else {
+						var pageX = e.pageX || (e.originalEvent ? e.originalEvent.pageX : 0);
+						var changeValue = pageX - previousMouseX;
+						moveElement(changeValue, e);
+                    }
+                  }, 250);
+                }
 
                 var downFn = function( event ){
                   //Setting some variables required for calculations.
@@ -21854,7 +21888,11 @@ module.filter('px', function() {
                   rightMoveLimit = gridLeft + $scope.grid.getViewportWidth();
 
                   if ( event.type === 'mousedown' ){
-                    $document.on('mousemove', moveFn);
+                    var scrollableElement = getScrollableElement();
+                    scrollableElement.on('scroll', scrollFn);
+                    $scope.grid.element.on('mousemove', moveFn);
+                    $scope.grid.element.on('mouseenter', mouseEnterFn);
+                    $scope.grid.element.on('mouseleave', mouseLeaveFn);
                     $document.on('mouseup', upFn);
                   } else if ( event.type === 'touchstart' ){
                     $document.on('touchmove', moveFn);
@@ -21875,7 +21913,7 @@ module.filter('px', function() {
                     cloneElement();
                   }
                   else if (elmCloned) {
-                    moveElement(changeValue);
+                    moveElement(changeValue, event);
                     previousMouseX = pageX;
                   }
                 };
@@ -22001,6 +22039,14 @@ module.filter('px', function() {
                 };
 
                 var offAllEvents = function() {
+                  var scrollableElement = getScrollableElement();
+                  delete $scope.grid.movingElm;
+
+                  scrollableElement.off('scroll', scrollFn);
+                  $scope.grid.element.off('mousemove', moveFn);
+                  $scope.grid.element.off('mouseenter', mouseEnterFn);
+                  $scope.grid.element.off('mouseleave', mouseLeaveFn);
+
                   $contentsElm.off('touchstart', downFn);
                   $contentsElm.off('mousedown', downFn);
 
@@ -22034,7 +22080,7 @@ module.filter('px', function() {
                   movingElm.css(movingElementStyles);
                 };
 
-                var moveElement = function (changeValue) {
+                var moveElement = function (changeValue, event) {
                   //Calculate total column width
                   var columns = $scope.grid.columns;
                   var totalColumnWidth = 0;
@@ -22051,17 +22097,25 @@ module.filter('px', function() {
 
                   newElementLeft = currentElmLeft - gridLeft + changeValue;
                   newElementLeft = newElementLeft < rightMoveLimit ? newElementLeft : rightMoveLimit;
-
+				  var pageX = $scope.grid.element.find('.ui-grid-viewport')[0].scrollLeft + event.pageX-gridLeft;
+				  var wrapperX = pageX - movingElm.offsetParent()[0].offsetLeft + changeValue;
+				  var left = movingElm[0].offsetLeft + changeValue;
+				  
+				  if(left > wrapperX){
+					  left = wrapperX;
+				  }
+				  
                   //Update css of moving column to adjust to new left value or fire scroll in case column has reached edge of grid
                   if ((currentElmLeft >= gridLeft || changeValue > 0) && (currentElmRight <= rightMoveLimit || changeValue < 0)) {
-                    movingElm.css({visibility: 'visible', 'left': (movingElm[0].offsetLeft +
-                    (newElementLeft < rightMoveLimit ? changeValue : (rightMoveLimit - currentElmLeft))) + 'px'});
-                  }
-                  else if (totalColumnWidth > Math.ceil(uiGridCtrl.grid.gridWidth)) {
-                    changeValue *= 8;
+                    movingElm.css({visibility: 'visible', 'left': left});
+                  } else if (totalColumnWidth > Math.ceil(uiGridCtrl.grid.gridWidth)) {
+					changeValue *= 8;
+                    if (changeValue > 0 && isHorizontalScrollAtEnd()) return;
+                    if (changeValue < 0 && isHorizontalScrollAtStart()) return;
                     var scrollEvent = new ScrollEvent($scope.col.grid, null, null, 'uiGridHeaderCell.moveElement');
                     scrollEvent.x = {pixels: changeValue};
                     scrollEvent.grid.scrollContainers('',scrollEvent);
+                    $scope.grid.movingElm = { element: movingElm, left, changeValue };
                   }
 
                   //Calculate total width of columns on the left of the moving column and the mouse movement
@@ -22090,6 +22144,24 @@ module.filter('px', function() {
                     movingElm.css({'width': reducedWidth + 'px'});
                   }
                 };
+              }
+
+              function getScrollableElement() {
+                var elm = angular.element($scope.grid.element).find(".ui-grid-viewport")[1] || angular.element($scope.grid.element).find(".ui-grid-viewport")[0];
+                return angular.element(elm);
+              }
+
+              function isHorizontalScrollAtStart() {
+                var scrollableElement = getScrollableElement()[0];
+                return scrollableElement.scrollLeft == 0;
+              }
+
+              function isHorizontalScrollAtEnd() {
+                var scrollableElement = getScrollableElement()[0];
+                var utilWidthWithBorders = (scrollableElement.scrollWidth - scrollableElement.offsetWidth);
+                var utilWidthWithoutBorders = (scrollableElement.scrollWidth - scrollableElement.clientWidth);
+                var horizontalScrollAtEnd = ((utilWidthWithBorders == scrollableElement.scrollLeft) || (utilWidthWithoutBorders == scrollableElement.scrollLeft));
+                return horizontalScrollAtEnd;
               }
             }
           };
