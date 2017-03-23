@@ -22464,16 +22464,16 @@ module.filter('px', function() {
                   // left position of the columns area when the uigrid is scrolling horizontally. Cannot be fixed the index 1. I only using this index because in my tests, the grid was multiselect = true
                   var offset = parseInt(angular.element($scope.grid.element.find(".ui-grid-header-cell-wrapper")[1]).css("margin-left"));
                   var left = $scope.grid.movingElm.left;
-				  var limit = $scope.grid.element[0].offsetWidth - 50;
+                  var limit = $scope.grid.element[0].offsetWidth - 50;
                   //left -= offset;
                   var maxScroll = getScrollableElement()[0].scrollWidth;
                   var scrolled = getScrollableElement()[0].scrollLeft;
                   left = (left > maxScroll || isHorizontalScrollAtEnd()) ? Math.ceil(maxScroll - $scope.grid.movingElm.element.width()) : scrolled == 0 ? 0 : left;
-				  if(left > limit) {
-					  left = limit;
-				  } else if (left < 0) {
-					  left = 0;
-				  }
+                  if(left > limit) {
+                    left = limit;
+                  } else if (left < 0) {
+                    left = 0;
+                  }
                   $scope.grid.movingElm.element.css({visibility: 'visible', 'left': left });
                 }
 
@@ -22486,9 +22486,9 @@ module.filter('px', function() {
                     if (!$scope.grid.movingElm || isHorizontalScrollAtEnd()) {
                       clearInterval(mouseMoveInterval);
                     } else {
-						var pageX = e.pageX || (e.originalEvent ? e.originalEvent.pageX : 0);
-						var changeValue = pageX - previousMouseX;
-						moveElement(changeValue, e);
+                      var pageX = e.pageX || (e.originalEvent ? e.originalEvent.pageX : 0);
+                      var changeValue = pageX - previousMouseX;
+                      moveElement(changeValue, e);
                     }
                   }, 250);
                 }
@@ -22714,19 +22714,19 @@ module.filter('px', function() {
 
                   newElementLeft = currentElmLeft - gridLeft + changeValue;
                   newElementLeft = newElementLeft < rightMoveLimit ? newElementLeft : rightMoveLimit;
-				  var pageX = $scope.grid.element.find('.ui-grid-viewport')[0].scrollLeft + event.pageX-gridLeft;
-				  var wrapperX = pageX - movingElm.offsetParent()[0].offsetLeft + changeValue;
-				  var left = movingElm[0].offsetLeft + changeValue;
-				  
-				  if(left > wrapperX){
-					  left = wrapperX;
-				  }
-				  
+                  var pageX = $scope.grid.element.find('.ui-grid-viewport')[0].scrollLeft + event.pageX-gridLeft;
+                  var wrapperX = pageX - movingElm.offsetParent()[0].offsetLeft + changeValue;
+                  var left = movingElm[0].offsetLeft + changeValue;
+
+                  if(left > wrapperX){
+                    left = wrapperX;
+                  }
+
                   //Update css of moving column to adjust to new left value or fire scroll in case column has reached edge of grid
                   if ((currentElmLeft >= gridLeft || changeValue > 0) && (currentElmRight <= rightMoveLimit || changeValue < 0)) {
                     movingElm.css({visibility: 'visible', 'left': left});
                   } else if (totalColumnWidth > Math.ceil(uiGridCtrl.grid.gridWidth)) {
-					changeValue *= 8;
+                    changeValue *= 8;
                     if (changeValue > 0 && isHorizontalScrollAtEnd()) return;
                     if (changeValue < 0 && isHorizontalScrollAtStart()) return;
                     var scrollEvent = new ScrollEvent($scope.col.grid, null, null, 'uiGridHeaderCell.moveElement');
