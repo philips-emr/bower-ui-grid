@@ -22471,7 +22471,7 @@ module.filter('px', function() {
                 }
 
                 var mouseLeaveFn = function(e) {
-                  mouseMoveInterval = setInterval(function moveElementScrolled() { 
+                  mouseMoveInterval = setInterval(function moveElementScrolled() {
                     if (!$scope.grid.movingElm || isHorizontalScrollAtEnd()) {
                       clearInterval(mouseMoveInterval);
                     } else {
@@ -22729,7 +22729,7 @@ module.filter('px', function() {
                     var scrollEvent = new ScrollEvent($scope.col.grid, null, null, 'uiGridHeaderCell.moveElement');
                     scrollEvent.x = {pixels: changeValue};
                     scrollEvent.grid.scrollContainers('',scrollEvent);
-                    $scope.grid.movingElm = { element: movingElm, left, changeValue };
+                    $scope.grid.movingElm = { element: movingElm, left: left, changeValue: changeValue };
                   }
 
                   //Calculate total width of columns on the left of the moving column and the mouse movement
