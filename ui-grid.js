@@ -21854,7 +21854,7 @@ module.filter('px', function() {
                 }
 
                 var mouseLeaveFn = function(e) {
-                  mouseMoveInterval = setInterval(() => {
+                  mouseMoveInterval = setInterval(function moveElementScrolled() { 
                     if (!$scope.grid.movingElm || isHorizontalScrollAtEnd()) {
                       clearInterval(mouseMoveInterval);
                     } else {
