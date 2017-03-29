@@ -22101,7 +22101,7 @@ module.filter('px', function() {
                   }
 
                   //Update css of moving column to adjust to new left value or fire scroll in case column has reached edge of grid
-                  if ((currentElmLeft >= gridLeft || changeValue > 0) && (currentElmRight <= rightMoveLimit || changeValue < 0)) {
+                  if ((currentElmLeft >= gridLeft || changeValue > 0) && (currentElmRight <= (rightMoveLimit - pinLeft) || changeValue < 0)) {
                     left += changeValue;
                     movingElm.css({visibility: 'visible', 'left': left});
                   } else if (totalColumnWidth > Math.ceil(uiGridCtrl.grid.gridWidth)) {
