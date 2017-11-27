@@ -5874,9 +5874,16 @@ angular.module('ui.grid')
     }
 
     // Build the styles without the explicit header heights
-    if (buildStyles) {
+    if (buildStyles && containerHeadersToRecalc.length == 0) {
       self.buildStyles();
     }
+
+    //reorder
+    containerHeadersToRecalc.sort(function (a, b) {
+      if (a.name > b.name) return -1;
+      if (a.name < b.name) return 1;
+      return 0;
+    })
 
     /*
      *
@@ -5978,7 +5985,7 @@ angular.module('ui.grid')
 
         // Rebuild styles if the header height has changed
         //   The header height is used in body/viewport calculations and those are then used in other styles so we need it to be available
-        if (buildStyles && rebuildStyles) {
+        if (buildStyles) {
           self.buildStyles();
         }
 
