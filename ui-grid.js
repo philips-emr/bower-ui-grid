@@ -8710,7 +8710,11 @@ angular.module('ui.grid')
       var rangeStart = Math.max(0, colIndex - self.grid.options.excessColumns);
       var rangeEnd = Math.min(columnCache.length, colIndex + minCols + self.grid.options.excessColumns);
 
-      newRange = [rangeStart, rangeEnd];
+      if (self.grid.movingElm && self.grid.currentRange) { //don't remove my columns while i'm moving them!
+        newRange = [Math.min(self.grid.currentRange[0], rangeStart), Math.max(self.grid.currentRange[1], rangeEnd)];
+      } else {
+        newRange = [rangeStart, rangeEnd];
+      }
     }
     else {
       var maxLen = self.visibleColumnCache.length;
@@ -8718,6 +8722,7 @@ angular.module('ui.grid')
       newRange = [0, Math.max(maxLen, minCols + self.grid.options.excessColumns)];
     }
 
+    self.grid.currentRange = newRange;
     self.updateViewableColumnRange(newRange);
 
     self.prevColumnScrollIndex = colIndex;
