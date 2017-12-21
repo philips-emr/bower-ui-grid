@@ -22129,8 +22129,11 @@ module.filter('px', function() {
                   }
                   if ($scope.newScrollLeft === undefined) {
                     if(movingElm && movingElm.position){
-                      var leftPos = movingElm.position().left + pinLeft;
-					            totalMouseMovement = leftPos - totalColumnsLeftWidth;
+					  var offsetColumn = $scope.grid && $scope.grid.renderContainers && $scope.grid.renderContainers.body && $scope.grid.renderContainers.body.columnOffset || 0;
+                      var leftPos = movingElm.position().left + offsetColumn + pinLeft;
+					  var isToUseLeftPos = totalColumnsLeftWidth < leftPos;
+					  
+					  totalMouseMovement = isToUseLeftPos ? leftPos : leftPos - totalColumnsLeftWidth;
                     } else {
                       totalMouseMovement += changeValue;
                     }
