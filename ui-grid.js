@@ -22128,7 +22128,12 @@ module.filter('px', function() {
                     }
                   }
                   if ($scope.newScrollLeft === undefined) {
-                    totalMouseMovement += changeValue;
+                    if(movingElm && movingElm.position){
+                      var leftPos = movingElm.position().left + pinLeft;
+					            totalMouseMovement = leftPos - totalColumnsLeftWidth;
+                    } else {
+                      totalMouseMovement += changeValue;
+                    }
                   }
                   else {
                     totalMouseMovement = $scope.newScrollLeft + newElementLeft - totalColumnsLeftWidth;
