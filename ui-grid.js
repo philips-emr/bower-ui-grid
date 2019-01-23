@@ -22524,7 +22524,9 @@ module.filter('px', function() {
                     cloneElement();
                   }
                   else if (elmCloned) {
-                    moveElement(changeValue, event);
+                    if (!$scope.col.colDef.fixed){
+                      moveElement(changeValue, event);
+                    }
                     previousMouseX = pageX;
                   }
                 };
