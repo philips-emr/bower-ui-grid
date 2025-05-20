@@ -1,0 +1,13 @@
+# yamllint disable-file
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: "bower-ui-grid"
+  description: "This repo is for distribution on npm and bower. The source for this module is in the main UI Grid repo. Please file issues and pull requests against that repo."
+  title: "Bower UI Grid"
+  tags:
+    - emr
+spec:
+  type: "library"
+  owner: "group:default/emr-tasy-framework-contributors"
+  lifecycle: "production"
